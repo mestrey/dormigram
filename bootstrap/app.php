@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__.'/../vendor/autoload.php';
+require_once __DIR__ . '/../vendor/autoload.php';
 
 (new Laravel\Lumen\Bootstrap\LoadEnvironmentVariables(
     dirname(__DIR__)
@@ -109,7 +109,10 @@ $app->configure('app');
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
 ], function ($router) {
-    require __DIR__.'/../routes/web.php';
+    $version = env('APP_VERSION');
+    $router->group(['prefix' => 'api/' . ($version ?  'v' . $version : '')], function ($router) {
+        require __DIR__ . '/../routes/web.php';
+    });
 });
 
 return $app;

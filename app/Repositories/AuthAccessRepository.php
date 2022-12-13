@@ -43,4 +43,9 @@ class AuthAccessRepository implements AuthAccessRepositoryContract
             'refresh_token' => $this->authAccessService->createResfreshToken($device),
         ]);
     }
+
+    public function getAuthAccessesByChunks(int $chunk, callable $callback)
+    {
+        AuthAccess::chunk($chunk, $callback);
+    }
 }

@@ -3,6 +3,8 @@
 namespace App\Services;
 
 use App\Contracts\Services\AuthAccessServiceContract;
+use App\Exceptions\Tokens\ExpiredTokenException;
+use App\Exceptions\Tokens\InvalidTokenException;
 
 class AuthAccessService implements AuthAccessServiceContract
 {
@@ -47,6 +49,11 @@ class AuthAccessService implements AuthAccessServiceContract
         return rtrim(strtr(base64_encode(json_encode($data)), '+/', '-_'), '=');
     }
 
+    private function decodeData(string $data): array
+    {
+        return json_decode(base64_decode(str_replace(array('-', '_'), array('+', '/'), $data)), true);
+    }
+
     private function getTokenSign(string $header, string $payload, string $secret): string
     {
         return hash_hmac(
@@ -84,5 +91,35 @@ class AuthAccessService implements AuthAccessServiceContract
             $this->getRefreshTokenPayload($device, $this->refreshTokenExp),
             $this->refreshTokenSecret
         );
+    }
+
+    private function isValidToken(string $token, string $secret): bool|\Exception
+    {
+        $parts = explode('.', $token);
+
+        if (count($parts) !== 3) {
+            throw new InvalidTokenException();
+        }
+
+        $encodedHeader = $parts[0];
+        $encodedPayload = $parts[1];
+        $signature = $parts[2];
+
+        $createdSignature = $this->getTokenSign($encodedHeader, $encodedPayload, $secret);
+
+        if ($signature !== $createdSignature) {
+            throw new InvalidTokenException();
+        }
+
+        if (time() > $this->decodeData($encodedPayload)['exp']) {
+            throw new ExpiredTokenException();
+        }
+
+        return true;
+    }
+
+    public function isValidRefreshToken(string $token): bool|\Exception
+    {
+        return $this->isValidToken($token, $this->refreshTokenSecret);
     }
 }

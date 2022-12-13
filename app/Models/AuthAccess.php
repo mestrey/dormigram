@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Contracts\Services\AuthAccessServiceContract;
 use Illuminate\Database\Eloquent\Model;
 
 class AuthAccess extends Model
@@ -11,6 +12,11 @@ class AuthAccess extends Model
         'token',
         'refresh_token',
     ];
+
+    public function getId()
+    {
+        return $this->attributes['id'];
+    }
 
     public function getToken()
     {

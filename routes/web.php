@@ -3,7 +3,7 @@
 $router->group(['prefix' => 'auth'], function () use ($router) {
     $router->post('login', 'AuthAccessController@login');
     // $router->get('register')
-    // $router->get('refresh')
+    $router->post('refresh', 'AuthAccessController@refresh');
 });
 
 $router->get('/', function () use ($router) {

@@ -18,6 +18,14 @@ class AuthAccessController extends Controller
     ) {
     }
 
+    private function returnAuthAccess(string $token, string $refreshToken): array
+    {
+        return ['data' => [
+            'token' => $token,
+            'refresh_token' => $refreshToken,
+        ]];
+    }
+
     public function register(Request $request)
     {
     }
@@ -38,14 +46,23 @@ class AuthAccessController extends Controller
 
         $authAccess = $this->authAccessRepository->createAuthAccess($user->getId(), $request->userAgent());
 
-        return ['data' => [
-            'token' => $authAccess->getToken(),
-            'refresh_token' => $authAccess->getRefreshToken(),
-        ]];
+        return $this->returnAuthAccess($authAccess->getToken(), $authAccess->getRefreshToken());
     }
 
     public function refresh(Request $request)
     {
+        $data = $this->validate($request, [
+            'token' => 'required',
+            'refresh_token' => 'required',
+        ]);
+
+        try {
+            $newToken = $this->authAccessRepository->refreshToken($data['token'], $data['refresh_token']);
+
+            return $this->returnAuthAccess($newToken->getToken(), $newToken->getRefreshToken());
+        } catch (\Exception $e) {
+            throw $e;
+        }
     }
 
     public function logout()

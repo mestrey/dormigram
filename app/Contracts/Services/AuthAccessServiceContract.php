@@ -12,7 +12,8 @@ interface AuthAccessServiceContract
     );
 
     public function createJWTToken(int $user_id, string $device): string;
-    public function createResfreshToken(string $device): string;
+    public function createResfreshToken(): string;
 
-    public function isValidRefreshToken(string $token): bool|\Exception;
+    public function validateJWTToken(string $token): array|\Exception;
+    public function validateRefreshToken(string $token): array|\Exception;
 }

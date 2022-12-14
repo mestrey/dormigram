@@ -27,10 +27,9 @@ class AuthAccessService implements AuthAccessServiceContract
         ];
     }
 
-    private function getRefreshTokenPayload(string $device, int $exp): array
+    private function getRefreshTokenPayload(int $exp): array
     {
         return [
-            'device' => $device,
             'exp' => time() + $exp * 60
         ];
     }
@@ -84,16 +83,16 @@ class AuthAccessService implements AuthAccessServiceContract
         );
     }
 
-    public function createResfreshToken(string $device): string
+    public function createResfreshToken(): string
     {
         return $this->createToken(
             $this->getHeader(),
-            $this->getRefreshTokenPayload($device, $this->refreshTokenExp),
+            $this->getRefreshTokenPayload($this->refreshTokenExp),
             $this->refreshTokenSecret
         );
     }
 
-    private function isValidToken(string $token, string $secret): bool|\Exception
+    private function validateToken(string $token, string $secret): array|\Exception
     {
         $parts = explode('.', $token);
 
@@ -111,15 +110,22 @@ class AuthAccessService implements AuthAccessServiceContract
             throw new InvalidTokenException();
         }
 
-        if (time() > $this->decodeData($encodedPayload)['exp']) {
+        $decodedPayload = $this->decodeData($encodedPayload);
+
+        if (time() > $decodedPayload['exp']) {
             throw new ExpiredTokenException();
         }
 
-        return true;
+        return $decodedPayload;
     }
 
-    public function isValidRefreshToken(string $token): bool|\Exception
+    public function validateRefreshToken(string $token): array|\Exception
     {
-        return $this->isValidToken($token, $this->refreshTokenSecret);
+        return $this->validateToken($token, $this->refreshTokenSecret);
+    }
+
+    public function validateJWTToken(string $token): array|\Exception
+    {
+        return $this->validateToken($token, $this->tokenSecret);
     }
 }

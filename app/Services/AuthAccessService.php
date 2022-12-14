@@ -19,7 +19,7 @@ class AuthAccessService implements AuthAccessServiceContract
     ) {
     }
 
-    private function getHeader(): array
+    private function generateHeader(): array
     {
         return [
             'alg' => self::HASHING_ALG,
@@ -27,14 +27,14 @@ class AuthAccessService implements AuthAccessServiceContract
         ];
     }
 
-    private function getRefreshTokenPayload(int $exp): array
+    private function generateRefreshTokenPayload(int $exp): array
     {
         return [
             'exp' => time() + $exp * 60
         ];
     }
 
-    private function getTokenPayload(int $userId, string $device, int $exp): array
+    private function generateTokenPayload(int $userId, string $device, int $exp): array
     {
         return [
             'user_id' => $userId,
@@ -77,8 +77,8 @@ class AuthAccessService implements AuthAccessServiceContract
     public function createJWTToken(int $userId, string $device): string
     {
         return $this->createToken(
-            $this->getHeader(),
-            $this->getTokenPayload($userId, $device, $this->tokenExp),
+            $this->generateHeader(),
+            $this->generateTokenPayload($userId, $device, $this->tokenExp),
             $this->tokenSecret
         );
     }
@@ -86,13 +86,13 @@ class AuthAccessService implements AuthAccessServiceContract
     public function createResfreshToken(): string
     {
         return $this->createToken(
-            $this->getHeader(),
-            $this->getRefreshTokenPayload($this->refreshTokenExp),
+            $this->generateHeader(),
+            $this->generateRefreshTokenPayload($this->refreshTokenExp),
             $this->refreshTokenSecret
         );
     }
 
-    private function validateToken(string $token, string $secret): array|\Exception
+    private function explodeToken(string $token)
     {
         $parts = explode('.', $token);
 
@@ -100,6 +100,20 @@ class AuthAccessService implements AuthAccessServiceContract
             throw new InvalidTokenException();
         }
 
+        return $parts;
+    }
+
+    public function getTokenPayload(string $token): array|\Exception
+    {
+        $parts = $this->explodeToken($token);
+        $encodedPayload = $parts[1];
+
+        return $this->decodeData($encodedPayload);
+    }
+
+    private function validateToken(string $token, string $secret): bool|\Exception
+    {
+        $parts = $this->explodeToken($token);
         $encodedHeader = $parts[0];
         $encodedPayload = $parts[1];
         $signature = $parts[2];
@@ -110,21 +124,19 @@ class AuthAccessService implements AuthAccessServiceContract
             throw new InvalidTokenException();
         }
 
-        $decodedPayload = $this->decodeData($encodedPayload);
-
-        if (time() > $decodedPayload['exp']) {
+        if (time() > $this->decodeData($encodedPayload)['exp']) {
             throw new ExpiredTokenException();
         }
 
-        return $decodedPayload;
+        return true;
     }
 
-    public function validateRefreshToken(string $token): array|\Exception
+    public function validateRefreshToken(string $token): bool|\Exception
     {
         return $this->validateToken($token, $this->refreshTokenSecret);
     }
 
-    public function validateJWTToken(string $token): array|\Exception
+    public function validateJWTToken(string $token): bool|\Exception
     {
         return $this->validateToken($token, $this->tokenSecret);
     }

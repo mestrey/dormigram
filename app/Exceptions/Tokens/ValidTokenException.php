@@ -6,6 +6,6 @@ class ValidTokenException extends \Exception
 {
     public function __construct()
     {
-        parent::__construct('Still Valid Token', 498);
+        parent::__construct('Still Valid Token', 406);
     }
 }

@@ -6,6 +6,6 @@ class InvalidTokenException extends \Exception
 {
     public function __construct()
     {
-        parent::__construct('Invalid Token', 498);
+        parent::__construct('Invalid Token', 401);
     }
 }

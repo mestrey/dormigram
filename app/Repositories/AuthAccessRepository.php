@@ -85,11 +85,10 @@ class AuthAccessRepository implements AuthAccessRepositoryContract
     {
         $authAccess = $this->getAuthAccessByTokens($token, $refreshToken);
         $authAccess->delete();
-        $dataToken = [];
         $tokenExpired = false;
 
         try {
-            $dataToken = $this->authAccessService->validateJWTToken($token);
+            $this->authAccessService->validateJWTToken($token);
         } catch (\Exception $e) {
             if (!$e instanceof ExpiredTokenException) {
                 throw $e;
@@ -102,12 +101,14 @@ class AuthAccessRepository implements AuthAccessRepositoryContract
             throw new ValidTokenException();
         }
 
+        $tokenPayload = $this->authAccessService->getTokenPayload($token);
+
         try {
             $this->authAccessService->validateRefreshToken($refreshToken);
         } catch (\Exception $e) {
             throw $e;
         }
 
-        return $this->createAuthAccess($dataToken['user_id'], $dataToken['device'], $refreshToken);
+        return $this->createAuthAccess($tokenPayload['user_id'], $tokenPayload['device'], $refreshToken);
     }
 }

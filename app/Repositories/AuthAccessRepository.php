@@ -7,6 +7,7 @@ use App\Contracts\Services\AuthAccessServiceContract;
 use App\Exceptions\Tokens\ExpiredTokenException;
 use App\Exceptions\Tokens\InvalidTokenException;
 use App\Exceptions\Tokens\NotFoundTokenException;
+use App\Exceptions\Tokens\ValidTokenException;
 use App\Models\AuthAccess;
 use Illuminate\Support\Collection;
 
@@ -85,13 +86,20 @@ class AuthAccessRepository implements AuthAccessRepositoryContract
         $authAccess = $this->getAuthAccessByTokens($token, $refreshToken);
         $authAccess->delete();
         $dataToken = [];
+        $tokenExpired = false;
 
         try {
             $dataToken = $this->authAccessService->validateJWTToken($token);
         } catch (\Exception $e) {
             if (!$e instanceof ExpiredTokenException) {
                 throw $e;
+            } else {
+                $tokenExpired = true;
             }
+        }
+
+        if (!$tokenExpired) {
+            throw new ValidTokenException();
         }
 
         try {

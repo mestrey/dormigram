@@ -1,24 +1,39 @@
-# Lumen PHP Framework
+# Dormigram
 
-[![Build Status](https://travis-ci.org/laravel/lumen-framework.svg)](https://travis-ci.org/laravel/lumen-framework)
-[![Total Downloads](https://img.shields.io/packagist/dt/laravel/lumen-framework)](https://packagist.org/packages/laravel/lumen-framework)
-[![Latest Stable Version](https://img.shields.io/packagist/v/laravel/lumen-framework)](https://packagist.org/packages/laravel/lumen-framework)
-[![License](https://img.shields.io/packagist/l/laravel/lumen)](https://packagist.org/packages/laravel/lumen-framework)
+A dormitory central system for requests and more (coming soon...).
 
-Laravel Lumen is a stunningly fast PHP micro-framework for building web applications with expressive, elegant syntax. We believe development must be an enjoyable, creative experience to be truly fulfilling. Lumen attempts to take the pain out of development by easing common tasks used in the majority of web projects, such as routing, database abstraction, queueing, and caching.
+## Run Locally
 
-## Official Documentation
+Clone the project
 
-Documentation for the framework can be found on the [Lumen website](https://lumen.laravel.com/docs).
+```bash
+  git clone https://github.com/mestrey/dormigram.git
+```
 
-## Contributing
+Go to the project directory
 
-Thank you for considering contributing to Lumen! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```bash
+  cd dormigram
+```
 
-## Security Vulnerabilities
+Install dependencies
 
-If you discover a security vulnerability within Lumen, please send an e-mail to Taylor Otwell at taylor@laravel.com. All security vulnerabilities will be promptly addressed.
+```bash
+  composer install
+```
 
-## License
+Start the server on public directory
 
-The Lumen framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## Roadmap
+
+### Backend
+
+- Add /register
+
+- Create new models for roles and expand the User table
+
+- Add auth middleware
+
+## Authors
+
+- [@mestrey](https://www.github.com/mestrey)

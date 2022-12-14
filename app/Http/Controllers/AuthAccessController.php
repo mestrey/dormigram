@@ -18,7 +18,7 @@ class AuthAccessController extends Controller
     ) {
     }
 
-    public function register()
+    public function register(Request $request)
     {
     }
 
@@ -42,5 +42,13 @@ class AuthAccessController extends Controller
             'token' => $authAccess->getToken(),
             'refresh_token' => $authAccess->getRefreshToken(),
         ]];
+    }
+
+    public function refresh(Request $request)
+    {
+    }
+
+    public function logout()
+    {
     }
 }

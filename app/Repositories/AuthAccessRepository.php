@@ -16,9 +16,9 @@ class AuthAccessRepository implements AuthAccessRepositoryContract
     ) {
     }
 
-    private function getAuthAccessesForUserId(int $user_id): Collection
+    private function getAuthAccessesForUserId(int $userId): Collection
     {
-        return AuthAccess::where('user_id', $user_id)->get();
+        return AuthAccess::where('user_id', $userId)->get();
     }
 
     private function removeOldestAuthAccesses($authAccesses, $count)
@@ -28,9 +28,9 @@ class AuthAccessRepository implements AuthAccessRepositoryContract
         }
     }
 
-    public function createAuthAccess(int $user_id, string $device): AuthAccess
+    public function createAuthAccess(int $userId, string $device): AuthAccess
     {
-        $userAuthAccesses = $this->getAuthAccessesForUserId($user_id);
+        $userAuthAccesses = $this->getAuthAccessesForUserId($userId);
         $availableConnections = $userAuthAccesses->count() - self::MAX_CONNECTIONS_PER_USER;
 
         if ($availableConnections >= 0) {
@@ -38,8 +38,8 @@ class AuthAccessRepository implements AuthAccessRepositoryContract
         }
 
         return AuthAccess::create([
-            'user_id' => $user_id,
-            'token' => $this->authAccessService->createJWTToken($user_id, $device),
+            'user_id' => $userId,
+            'token' => $this->authAccessService->createJWTToken($userId, $device),
             'refresh_token' => $this->authAccessService->createResfreshToken($device),
         ]);
     }

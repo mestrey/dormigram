@@ -75,11 +75,11 @@ class AuthAccessService implements AuthAccessServiceContract
         )]);
     }
 
-    public function createJWTToken(int $user_id, string $device): string
+    public function createJWTToken(int $userId, string $device): string
     {
         return $this->createToken(
             $this->getHeader(),
-            $this->getTokenPayload($user_id, $device, $this->tokenExp),
+            $this->getTokenPayload($userId, $device, $this->tokenExp),
             $this->tokenSecret
         );
     }

@@ -92,7 +92,7 @@ class AuthAccessService implements AuthAccessServiceContract
         );
     }
 
-    private function explodeToken(string $token)
+    private function explodeToken(string $token): array|\Exception
     {
         $parts = explode('.', $token);
 

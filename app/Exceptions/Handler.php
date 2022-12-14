@@ -50,13 +50,13 @@ class Handler extends ExceptionHandler
     public function render($request, Throwable $exception)
     {
         $rendered = parent::render($request, $exception);
-        $eCode = $exception->getCode();
+        $code = !empty($exception->getCode()) ? $exception->getCode() : $rendered->getStatusCode();
 
         return response()->json([
             'error' => [
-                'code' => !empty($eCode) ? $eCode : $rendered->getStatusCode(),
+                'code' => $code,
                 'message' => $exception->getMessage(),
             ],
-        ], $rendered->getStatusCode());
+        ], $code);
     }
 }

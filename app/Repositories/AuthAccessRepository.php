@@ -101,13 +101,8 @@ class AuthAccessRepository implements AuthAccessRepositoryContract
             throw new ValidTokenException();
         }
 
+        $this->authAccessService->validateRefreshToken($refreshToken);
         $tokenPayload = $this->authAccessService->getTokenPayload($token);
-
-        try {
-            $this->authAccessService->validateRefreshToken($refreshToken);
-        } catch (\Exception $e) {
-            throw $e;
-        }
 
         return $this->createAuthAccess($tokenPayload['user_id'], $tokenPayload['device'], $refreshToken);
     }

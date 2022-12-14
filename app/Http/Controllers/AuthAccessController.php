@@ -56,13 +56,9 @@ class AuthAccessController extends Controller
             'refresh_token' => 'required',
         ]);
 
-        try {
-            $newToken = $this->authAccessRepository->refreshToken($data['token'], $data['refresh_token']);
+        $newToken = $this->authAccessRepository->refreshToken($data['token'], $data['refresh_token']);
 
-            return $this->returnAuthAccess($newToken->getToken(), $newToken->getRefreshToken());
-        } catch (\Exception $e) {
-            throw $e;
-        }
+        return $this->returnAuthAccess($newToken->getToken(), $newToken->getRefreshToken());
     }
 
     public function logout()

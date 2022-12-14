@@ -6,5 +6,6 @@ use App\Models\User;
 
 interface UserRepositoryContract
 {
+    public function getUserById(int $id): ?User;
     public function getUserByEmail(string $email): ?User;
 }

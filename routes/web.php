@@ -6,6 +6,6 @@ $router->group(['prefix' => 'auth'], function () use ($router) {
     $router->post('refresh', 'AuthAccessController@refresh');
 });
 
-$router->get('/', function () use ($router) {
+$router->get('/', ['middleware' => 'auth', function () use ($router) {
     return $router->app->version();
-});
+}]);

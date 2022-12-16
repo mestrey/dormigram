@@ -13,6 +13,11 @@ class AuthAccess extends Model
         'refresh_token',
     ];
 
+    protected $visible = [
+        'token',
+        'refresh_token'
+    ];
+
     public function getId()
     {
         return $this->attributes['id'];

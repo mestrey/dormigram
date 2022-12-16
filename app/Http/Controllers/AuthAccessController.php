@@ -18,12 +18,11 @@ class AuthAccessController extends Controller
     ) {
     }
 
-    private function returnAuthAccess(string $token, string $refreshToken): array
+    private function returnAuthAccess(int $userId, string $device): array
     {
-        return ['data' => [
-            'token' => $token,
-            'refresh_token' => $refreshToken,
-        ]];
+        $authAccess = $this->authAccessRepository->createAuthAccess($userId, $device);
+
+        return $authAccess->toArray();
     }
 
     public function register(Request $request)
@@ -44,9 +43,7 @@ class AuthAccessController extends Controller
             throw new UnauthorizedException();
         }
 
-        $authAccess = $this->authAccessRepository->createAuthAccess($user->getId(), $request->userAgent());
-
-        return $this->returnAuthAccess($authAccess->getToken(), $authAccess->getRefreshToken());
+        return $this->returnAuthAccess($user->getId(), $request->userAgent());
     }
 
     public function refresh(Request $request)
@@ -56,9 +53,9 @@ class AuthAccessController extends Controller
             'refresh_token' => 'required',
         ]);
 
-        $newToken = $this->authAccessRepository->refreshToken($data['token'], $data['refresh_token']);
+        $newAuthAccess = $this->authAccessRepository->refreshToken($data['token'], $data['refresh_token']);
 
-        return $this->returnAuthAccess($newToken->getToken(), $newToken->getRefreshToken());
+        return $newAuthAccess->toArray();
     }
 
     public function logout()

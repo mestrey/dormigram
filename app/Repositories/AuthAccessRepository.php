@@ -44,8 +44,18 @@ class AuthAccessRepository implements AuthAccessRepositoryContract
         return AuthAccess::create([
             'user_id' => $userId,
             'token' => $this->authAccessService->createJWTToken($userId, $device),
-            'refresh_token' => $refreshToken ?? $this->authAccessService->createResfreshToken($device),
+            'refresh_token' => $refreshToken ?? $this->authAccessService->createResfreshToken(),
         ]);
+    }
+
+    public function refreshAuthAccess(int $userId, string $device, string $refreshToken): AuthAccess
+    {
+        $payload = $this->authAccessService->getTokenPayload($refreshToken);
+        $payload['used']++;
+
+        $newRefreshToken = $this->authAccessService->updateResfreshToken($payload['exp'], $payload['used']);
+
+        return $this->createAuthAccess($userId, $device, $newRefreshToken);
     }
 
     public function getAuthAccessesByChunks(int $chunk, callable $callback)
@@ -58,15 +68,15 @@ class AuthAccessRepository implements AuthAccessRepositoryContract
         $authAccessByToken = AuthAccess::where('token', $token)->first();
         $authAccessByRefreshToken = AuthAccess::where('refresh_token', $refreshToken)->first();
 
-        $ifOneExist = function (?AuthAccess $a, ?AuthAccess $b) {
+        $ifOnlyOneExist = function (?AuthAccess $a, ?AuthAccess $b) {
             if (empty($a) && !empty($b)) {
                 $b->delete();
                 throw new InvalidTokenException();
             }
         };
 
-        $ifOneExist($authAccessByToken, $authAccessByRefreshToken);
-        $ifOneExist($authAccessByRefreshToken, $authAccessByToken);
+        $ifOnlyOneExist($authAccessByToken, $authAccessByRefreshToken);
+        $ifOnlyOneExist($authAccessByRefreshToken, $authAccessByToken);
 
         if (empty($authAccessByToken) && empty($authAccessByRefreshToken)) {
             throw new NotFoundTokenException();
@@ -104,6 +114,6 @@ class AuthAccessRepository implements AuthAccessRepositoryContract
         $this->authAccessService->validateRefreshToken($refreshToken);
         $tokenPayload = $this->authAccessService->getTokenPayload($token);
 
-        return $this->createAuthAccess($tokenPayload['user_id'], $tokenPayload['device'], $refreshToken);
+        return $this->refreshAuthAccess($tokenPayload['user_id'], $tokenPayload['device'], $refreshToken);
     }
 }

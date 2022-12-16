@@ -27,10 +27,16 @@ class AuthAccessService implements AuthAccessServiceContract
         ];
     }
 
-    private function generateRefreshTokenPayload(int $exp): array
+    private function generateExpirationFromMinutes(int $exp): int
+    {
+        return time() + $exp * 60;
+    }
+
+    private function generateRefreshTokenPayload(int $exp, int $used = 0): array
     {
         return [
-            'exp' => time() + $exp * 60
+            'exp' =>  $exp,
+            'used' => $used,
         ];
     }
 
@@ -39,7 +45,7 @@ class AuthAccessService implements AuthAccessServiceContract
         return [
             'user_id' => $userId,
             'device' => $device,
-            'exp' => time() + $exp * 60,
+            'exp' => $exp,
         ];
     }
 
@@ -78,18 +84,23 @@ class AuthAccessService implements AuthAccessServiceContract
     {
         return $this->createToken(
             $this->generateHeader(),
-            $this->generateTokenPayload($userId, $device, $this->tokenExp),
+            $this->generateTokenPayload($userId, $device, $this->generateExpirationFromMinutes($this->tokenExp)),
             $this->tokenSecret
         );
     }
 
-    public function createResfreshToken(): string
+    public function createResfreshToken(?array $payload = null): string
     {
         return $this->createToken(
             $this->generateHeader(),
-            $this->generateRefreshTokenPayload($this->refreshTokenExp),
+            $payload ?? $this->generateRefreshTokenPayload($this->generateExpirationFromMinutes($this->refreshTokenExp)),
             $this->refreshTokenSecret
         );
+    }
+
+    public function updateResfreshToken(string $exp, int $used): string
+    {
+        return $this->createResfreshToken($this->generateRefreshTokenPayload(intval($exp), $used));
     }
 
     private function explodeToken(string $token): array|\Exception

@@ -17,7 +17,7 @@ class AuthRemoveExpiredRefreshTokensCommand extends Command
     ) {
         $countRemoved = 0;
 
-        $authAccessRepository->getAuthAccessesByChunks(2, function ($authAccesses) use ($authAccessService, &$countRemoved) {
+        $authAccessRepository->getAuthAccessesByChunks(100, function ($authAccesses) use ($authAccessService, &$countRemoved) {
             foreach ($authAccesses as $authAccess) {
                 try {
                     $authAccessService->validateRefreshToken($authAccess->getRefreshToken());

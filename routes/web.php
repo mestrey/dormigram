@@ -1,7 +1,7 @@
 <?php
 
 $router->group(['prefix' => 'auth'], function () use ($router) {
-    // $router->get('register')
+    $router->post('register', 'AuthAccessController@register');
     $router->post('login', 'AuthAccessController@login');
     $router->post('refresh', 'AuthAccessController@refresh');
     $router->get('logout', [

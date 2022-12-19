@@ -17,13 +17,4 @@ class UserServiceProvider extends ServiceProvider
     {
         $this->app->singleton(UserRepositoryContract::class, UserRepository::class);
     }
-
-    /**
-     * Boot the authentication services for the application.
-     *
-     * @return void
-     */
-    public function boot()
-    {
-    }
 }

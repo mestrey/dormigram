@@ -27,6 +27,12 @@ class AuthAccessController extends Controller
 
     public function register(Request $request)
     {
+        $data = $this->validate($request, [
+            'first_name' => 'required|cyrillic',
+            'middle_name' => 'required|cyrillic',
+            'last_name' => 'required|cyrillic',
+            'password' => 'required',
+        ]);
     }
 
     public function login(Request $request)

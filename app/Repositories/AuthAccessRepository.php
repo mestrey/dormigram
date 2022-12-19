@@ -63,6 +63,17 @@ class AuthAccessRepository implements AuthAccessRepositoryContract
         AuthAccess::chunk($chunk, $callback);
     }
 
+    public function removeAuthAccessByToken(string $token): bool
+    {
+        $authAccess = AuthAccess::where('token', $token)->first();
+
+        if (empty($authAccess)) {
+            throw new InvalidTokenException();
+        }
+
+        return $authAccess->delete();
+    }
+
     private function getAuthAccessByTokens(string $token, string $refreshToken): AuthAccess|\Exception
     {
         $authAccessByToken = AuthAccess::where('token', $token)->first();

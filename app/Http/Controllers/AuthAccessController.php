@@ -58,7 +58,10 @@ class AuthAccessController extends Controller
         return $newAuthAccess->toArray();
     }
 
-    public function logout()
+    public function logout(Request $request)
     {
+        return [
+            'success' => (bool)$this->authAccessRepository->removeAuthAccessByToken($request->bearerToken())
+        ];
     }
 }

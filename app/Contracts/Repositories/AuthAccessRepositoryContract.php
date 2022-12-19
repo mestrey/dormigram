@@ -11,4 +11,6 @@ interface AuthAccessRepositoryContract
     public function getAuthAccessesByChunks(int $chunk, callable $callback);
 
     public function refreshToken(string $token, string $refreshToken): AuthAccess|\Exception;
+
+    public function removeAuthAccessByToken(string $token): bool;
 }

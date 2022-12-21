@@ -154,4 +154,5 @@ return [
     */
 
     'cyrillic' => 'The :attribute must be in cyrillic',
+    'phone' => 'The :attribute must be a russian phone number',
 ];

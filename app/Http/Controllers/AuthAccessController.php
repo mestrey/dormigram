@@ -29,10 +29,31 @@ class AuthAccessController extends Controller
     {
         $data = $this->validate($request, [
             'first_name' => 'required|cyrillic',
-            'middle_name' => 'required|cyrillic',
+            'middle_name' => 'cyrillic',
             'last_name' => 'required|cyrillic',
-            'password' => 'required',
+            'phone' => 'required|phone',
+            'email' => 'required|email',
+            'password' => 'required|min:6|password',
+            'role' => 'required',
         ]);
+
+        $errorWhileCreating = new \Exception('Error while creating user');
+
+        try {
+            $user = $this->userRepository->createUser($data);
+        } catch (\Illuminate\Database\QueryException $e) {
+            $errorCode = $e->errorInfo[0];
+
+            if ($errorCode === '23000') {
+                throw new \Exception('User already exists');
+            } else {
+                throw $errorWhileCreating;
+            }
+        } catch (\Exception $e) {
+            throw $errorWhileCreating;
+        }
+
+        return $this->returnAuthAccess($user->getId(), $request->userAgent());
     }
 
     public function login(Request $request)

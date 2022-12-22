@@ -18,6 +18,9 @@ class RoleSeeder extends Seeder
     {
         $roleRepository->truncate();
 
-        $roleRepository->create(['name' => 'admin']);
+        $roleRepository->create(['name' => Role::ADMIN_ROLE_NAME]);
+        $roleRepository->create(['name' => Role::STUDENT_ROLE_NAME]);
+        $roleRepository->create(['name' => Role::COMMANDANT_ROLE_NAME]);
+        $roleRepository->create(['name' => Role::REPAIRMAN_ROLE_NAME]);
     }
 }

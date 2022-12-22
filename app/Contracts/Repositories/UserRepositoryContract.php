@@ -3,6 +3,7 @@
 namespace App\Contracts\Repositories;
 
 use App\Models\User;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 interface UserRepositoryContract
 {
@@ -10,4 +11,8 @@ interface UserRepositoryContract
     public function getByEmail(string $email): ?User;
 
     public function create(array $data): User;
+
+    public function paginateAt(int $perPage, int $pageNumber, bool $verified = false): LengthAwarePaginator;
+
+    public function verifyToggle(int $id): User;
 }

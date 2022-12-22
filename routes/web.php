@@ -10,6 +10,10 @@ $router->group(['prefix' => 'auth'], function () use ($router) {
     ]);
 });
 
-$router->get('/', ['middleware' => ['auth', 'verified'], function () use ($router) {
-    return $router->app->version();
-}]);
+$router->group([
+    'middleware' => ['auth', 'verified', 'moderation'],
+    'prefix' => 'moderation'
+], function () use ($router) {
+    $router->get('users', 'ModerationController@users');
+    $router->get('verify/{userId}', 'ModerationController@verify');
+});

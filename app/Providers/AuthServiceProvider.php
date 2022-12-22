@@ -2,8 +2,10 @@
 
 namespace App\Providers;
 
-use App\Models\User;
-use Illuminate\Support\Facades\Gate;
+use App\Contracts\Repositories\AuthAccessRepositoryContract;
+use App\Contracts\Services\AuthAccessServiceContract;
+use App\Repositories\AuthAccessRepository;
+use App\Services\AuthAccessService;
 use Illuminate\Support\ServiceProvider;
 
 class AuthServiceProvider extends ServiceProvider
@@ -15,7 +17,16 @@ class AuthServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        $this->app->singleton(AuthAccessServiceContract::class, function () {
+            return new AuthAccessService(
+                env('AUTH_TOKEN_SECRET'),
+                env('AUTH_REFRESH_TOKEN_SECRET'),
+                env('AUTH_TOKEN_EXP_MIN'),
+                env('AUTH_REFRESH_TOKEN_EXP_MIN')
+            );
+        });
+
+        $this->app->singleton(AuthAccessRepositoryContract::class, AuthAccessRepository::class);
     }
 
     /**
@@ -25,15 +36,5 @@ class AuthServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        // Here you may define how you wish users to be authenticated for your Lumen
-        // application. The callback which receives the incoming request instance
-        // should return either a User instance or null. You're free to obtain
-        // the User instance via an API token or any other method necessary.
-
-        $this->app['auth']->viaRequest('api', function ($request) {
-            if ($request->input('api_token')) {
-                return User::where('api_token', $request->input('api_token'))->first();
-            }
-        });
     }
 }

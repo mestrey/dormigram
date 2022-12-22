@@ -2,7 +2,9 @@
 
 namespace App\Providers;
 
+use App\Contracts\Repositories\RoleRepositoryContract;
 use App\Contracts\Repositories\UserRepositoryContract;
+use App\Repositories\RoleRepository;
 use App\Repositories\UserRepository;
 use Illuminate\Support\ServiceProvider;
 
@@ -16,5 +18,6 @@ class UserServiceProvider extends ServiceProvider
     public function register()
     {
         $this->app->singleton(UserRepositoryContract::class, UserRepository::class);
+        $this->app->singleton(RoleRepositoryContract::class, RoleRepository::class);
     }
 }

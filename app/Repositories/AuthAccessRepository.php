@@ -32,7 +32,7 @@ class AuthAccessRepository implements AuthAccessRepositoryContract
         }
     }
 
-    public function createAuthAccess(int $userId, string $device, ?string $refreshToken = null): AuthAccess
+    public function create(int $userId, string $device, ?string $refreshToken = null): AuthAccess
     {
         $userAuthAccesses = $this->getAuthAccessesByUserId($userId);
         $availableConnections = $userAuthAccesses->count() - self::MAX_CONNECTIONS_PER_USER;
@@ -55,15 +55,15 @@ class AuthAccessRepository implements AuthAccessRepositoryContract
 
         $newRefreshToken = $this->authAccessService->updateResfreshToken($payload['exp'], $payload['used']);
 
-        return $this->createAuthAccess($userId, $device, $newRefreshToken);
+        return $this->create($userId, $device, $newRefreshToken);
     }
 
-    public function getAuthAccessesByChunks(int $chunk, callable $callback)
+    public function getByChunks(int $chunk, callable $callback)
     {
         AuthAccess::chunk($chunk, $callback);
     }
 
-    public function removeAuthAccessByToken(string $token): bool
+    public function removeByToken(string $token): bool
     {
         $authAccess = AuthAccess::where('token', $token)->first();
 

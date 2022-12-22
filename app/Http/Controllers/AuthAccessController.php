@@ -20,7 +20,7 @@ class AuthAccessController extends Controller
 
     private function returnAuthAccess(int $userId, string $device): array
     {
-        $authAccess = $this->authAccessRepository->createAuthAccess($userId, $device);
+        $authAccess = $this->authAccessRepository->create($userId, $device);
 
         return $authAccess->toArray();
     }
@@ -40,7 +40,7 @@ class AuthAccessController extends Controller
         $errorWhileCreating = new \Exception('Error while creating user');
 
         try {
-            $user = $this->userRepository->createUser($data);
+            $user = $this->userRepository->create($data);
         } catch (\Illuminate\Database\QueryException $e) {
             $errorCode = $e->errorInfo[0];
 
@@ -63,7 +63,7 @@ class AuthAccessController extends Controller
             'password' => 'required',
         ]);
 
-        $user = $this->userRepository->getUserByEmail($data['email']) ??
+        $user = $this->userRepository->getByEmail($data['email']) ??
             throw new AccountNotFoundException();
 
         if (!Hash::check($data['password'], $user->getPassword())) {
@@ -88,7 +88,7 @@ class AuthAccessController extends Controller
     public function logout(Request $request)
     {
         return [
-            'success' => (bool)$this->authAccessRepository->removeAuthAccessByToken($request->bearerToken())
+            'success' => (bool)$this->authAccessRepository->removeByToken($request->bearerToken())
         ];
     }
 }

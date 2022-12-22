@@ -36,7 +36,7 @@ class AuthMiddleware
             throw new InvalidTokenException();
         }
 
-        $user = $this->userRepository->getUserById($tokenPayload['user_id']) ??
+        $user = $this->userRepository->getById($tokenPayload['user_id']) ??
             throw new AccountNotFoundException();
 
         $request->merge(['user' => $user]);

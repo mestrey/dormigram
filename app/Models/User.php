@@ -21,6 +21,11 @@ class User extends Model
         return $this->attributes['id'];
     }
 
+    public function getRoleId()
+    {
+        return $this->attributes['role_id'];
+    }
+
     public function getPassword()
     {
         return $this->attributes['password'];

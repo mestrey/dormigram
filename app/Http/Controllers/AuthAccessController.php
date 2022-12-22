@@ -4,10 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Contracts\Repositories\AuthAccessRepositoryContract;
 use App\Contracts\Repositories\RoleRepositoryContract;
+use App\Contracts\Repositories\StudentRepositoryContract;
 use App\Contracts\Repositories\UserRepositoryContract;
 use App\Exceptions\Users\AccountNotFoundException;
 use App\Exceptions\UnauthorizedException;
 use App\Exceptions\Users\RoleUnrecognizedException;
+use App\Models\Role;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Lumen\Routing\Controller;
@@ -27,23 +29,42 @@ class AuthAccessController extends Controller
         return $authAccess->toArray();
     }
 
-    public function register(Request $request, RoleRepositoryContract $roleRepository)
-    {
-        $data = $this->validate($request, [
-            'first_name' => 'required|cyrillic',
-            'middle_name' => 'cyrillic',
-            'last_name' => 'required|cyrillic',
+    public function register(
+        Request $request,
+        RoleRepositoryContract $roleRepository,
+        StudentRepositoryContract $studentRepository,
+    ) {
+        $userData = $this->validate($request, [
+            'first_name' => 'required|cyrillic|max:30',
+            'middle_name' => 'cyrillic|max:30',
+            'last_name' => 'required|cyrillic|max:30',
             'phone' => 'required|phone|unique:users',
             'email' => 'required|email|unique:users',
             'password' => 'required|min:6|password',
             'role' => 'required',
         ]);
 
-        $role = $roleRepository->getByName($data['role']) ??
+        $role = $roleRepository->getByName($userData['role']) ??
             throw new RoleUnrecognizedException();
-        $data['role_id'] = $role->getId();
+        $userData['role_id'] = $role->getId();
 
-        $user = $this->userRepository->create($data);
+        $createUser = function () use ($userData) {
+            return $this->userRepository->create($userData);
+        };
+
+        switch ($role->getName()) {
+            case Role::STUDENT_ROLE_NAME:
+                $studentData = $this->validate($request, [
+                    'room' => 'required',
+                ]);
+                $user = $createUser();
+                $studentData['user_id'] = $user->getId();
+                $studentRepository->create($studentData);
+                break;
+            default:
+                $user = $createUser();
+                break;
+        }
 
         return $this->returnAuthAccess($user->getId(), $request->userAgent());
     }

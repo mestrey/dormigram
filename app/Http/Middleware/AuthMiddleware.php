@@ -4,7 +4,7 @@ namespace App\Http\Middleware;
 
 use App\Contracts\Repositories\UserRepositoryContract;
 use App\Contracts\Services\AuthAccessServiceContract;
-use App\Exceptions\AccountNotFoundException;
+use App\Exceptions\Users\AccountNotFoundException;
 use App\Exceptions\Tokens\InvalidTokenException;
 use App\Exceptions\UnauthorizedException;
 use Closure;

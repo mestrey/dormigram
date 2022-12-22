@@ -12,6 +12,11 @@ class RoleRepository implements RoleRepositoryContract
         return Role::create($data);
     }
 
+    public function getByName(string $name): ?Role
+    {
+        return Role::where('name', $name)->first();
+    }
+
     public function truncate()
     {
         return Role::truncate();

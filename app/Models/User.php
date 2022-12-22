@@ -13,6 +13,7 @@ class User extends Model
         'email',
         'phone',
         'password',
+        'role_id',
     ];
 
     public function getId()

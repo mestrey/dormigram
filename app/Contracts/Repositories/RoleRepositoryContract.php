@@ -8,5 +8,7 @@ interface RoleRepositoryContract
 {
     public function create(array $data): Role;
 
+    public function getByName(string $name): ?Role;
+
     public function truncate();
 }

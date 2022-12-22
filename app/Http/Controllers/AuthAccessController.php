@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Contracts\Repositories\AuthAccessRepositoryContract;
+use App\Contracts\Repositories\RoleRepositoryContract;
 use App\Contracts\Repositories\UserRepositoryContract;
-use App\Exceptions\AccountNotFoundException;
+use App\Exceptions\Users\AccountNotFoundException;
 use App\Exceptions\UnauthorizedException;
+use App\Exceptions\Users\RoleUnrecognizedException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Lumen\Routing\Controller;
@@ -25,33 +27,23 @@ class AuthAccessController extends Controller
         return $authAccess->toArray();
     }
 
-    public function register(Request $request)
+    public function register(Request $request, RoleRepositoryContract $roleRepository)
     {
         $data = $this->validate($request, [
             'first_name' => 'required|cyrillic',
             'middle_name' => 'cyrillic',
             'last_name' => 'required|cyrillic',
-            'phone' => 'required|phone',
-            'email' => 'required|email',
+            'phone' => 'required|phone|unique:users',
+            'email' => 'required|email|unique:users',
             'password' => 'required|min:6|password',
             'role' => 'required',
         ]);
 
-        $errorWhileCreating = new \Exception('Error while creating user');
+        $role = $roleRepository->getByName($data['role']) ??
+            throw new RoleUnrecognizedException();
+        $data['role_id'] = $role->getId();
 
-        try {
-            $user = $this->userRepository->create($data);
-        } catch (\Illuminate\Database\QueryException $e) {
-            $errorCode = $e->errorInfo[0];
-
-            if ($errorCode === '23000') {
-                throw new \Exception('User already exists');
-            } else {
-                throw $errorWhileCreating;
-            }
-        } catch (\Exception $e) {
-            throw $errorWhileCreating;
-        }
+        $user = $this->userRepository->create($data);
 
         return $this->returnAuthAccess($user->getId(), $request->userAgent());
     }

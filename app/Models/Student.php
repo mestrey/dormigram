@@ -10,4 +10,9 @@ class Student extends Model
         'user_id',
         'room',
     ];
+
+    public function user()
+    {
+        $this->belongsTo(User::class);
+    }
 }

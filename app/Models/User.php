@@ -35,4 +35,14 @@ class User extends Model
     {
         return $this->attributes['verified'];
     }
+
+    public function verify(bool $verify)
+    {
+        $this->attributes['verified'] = $verify;
+    }
+
+    public function students()
+    {
+        return $this->hasMany(Student::class);
+    }
 }

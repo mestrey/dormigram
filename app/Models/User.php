@@ -30,4 +30,9 @@ class User extends Model
     {
         return $this->attributes['password'];
     }
+
+    public function isVerified()
+    {
+        return $this->attributes['verified'];
+    }
 }

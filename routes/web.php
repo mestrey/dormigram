@@ -10,6 +10,6 @@ $router->group(['prefix' => 'auth'], function () use ($router) {
     ]);
 });
 
-$router->get('/', ['middleware' => 'auth', function () use ($router) {
+$router->get('/', ['middleware' => ['auth', 'verified'], function () use ($router) {
     return $router->app->version();
 }]);
